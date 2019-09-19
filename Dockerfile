@@ -2,7 +2,7 @@
 # Base image
 ################################################################################
 
-FROM php:7.2.2-fpm-alpine
+FROM php:7.4.0RC1-fpm-alpine
 
 ################################################################################
 # Build instructions
@@ -30,6 +30,8 @@ RUN apk add --update --no-cache --virtual .build-deps \
 		pkgconf \
 		re2c \
         imagemagick-dev \
+        oniguruma-dev \
+        libzip-dev \
     && echo | pecl install -f imagick \
     && echo | pecl install -f mongodb \
     && docker-php-ext-configure \
@@ -73,6 +75,7 @@ RUN apk add --update --no-cache --virtual .build-deps \
         libxpm \
         nodejs \
         nodejs-npm \
+        libzip \
     && rm -rf /var/cache/apk/* \
     && rm -rf /tmp/pear \
     && rm -rf /usr/src
@@ -86,9 +89,11 @@ RUN curl -sS https://getcomposer.org/installer | php \
 RUN mkdir /project
 RUN touch /tmp/docker.txt
 
-RUN composer global require "fxp/composer-asset-plugin:~1.1"
+RUN composer global require "fxp/composer-asset-plugin:~1.4"
+RUN composer global require hirak/prestissimo
+RUN composer config --global github-oauth.github.com 248531bddfaca25ef49fd5310073cfa0e6b182a4
 
-RUN npm -g install bower
+RUN /usr/bin/npm -g install bower
 
 RUN apk add --update --no-cache git
 
